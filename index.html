@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head >
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LIDYA School App</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="lidya_icon_512x512.png" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+
+    :root {
+      --primary: #0a9396;
+      --bg-light: #f0f0f0;
+      --bg-dark: #1e1e1e;
+      --text-light: #ffffff;
+      --text-dark: #000000;
+      --card-bg-light: white;
+      --card-bg-dark: #2a2a2a;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+    }
+    .page {
+      display: none;
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--card-bg-light);
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      box-sizing: border-box;
+    }
+    body.dark .page {
+      background: var(--card-bg-dark);
+    }
+    .visible { display: block; }
+    input, select, button {
+      width: 100%;
+      padding: 0.7rem;
+      margin: 0.5rem 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    .gray { background: #888; }
+    h2 { text-align: center; margin-bottom: 1rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    th { background: var(--primary); color: white; }
+    img.logo {
+      display: block;
+      margin: 0 auto 1rem auto;
+      max-width: 80px;
+      height: auto;
+    }
+    .topbar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .topbar > div {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .topbar .controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .password-container { 
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;  
+      position: relative;
+      width: 100%;
+    } 
+    .password-container input[type="password"],
+    .password-container input[type="text"] {
+      width: 100%;
+      padding-right: 60px; /* space for checkbox label */
+      box-sizing: border-box;
+    }
+    .password-container label { 
+      font-weight: normal;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.9rem;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .password-container label input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    /* Media Queries for Mobile Responsiveness */
+    @media (min-width: 601px) {
+        body {
+            padding: 2rem;
+        }
+        .page {
+            padding: 2rem;
+        }
+        .topbar {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .password-container {
+            flex-direction: row;
+            align-items: center;
+        }
+        .password-container input[type="password"],
+        .password-container input[type="text"] {
+            padding-right: 60px;
+        }
+        .password-container label {
+          position: static;
+          transform: none;
+          margin-left: 0.5rem;
+          top: auto;
+          right: auto;
+        }
+    }
+
+    @media (max-width: 400px) {
+        body {
+            padding: 0.5rem;
+        }
+        .page {
+            padding: 1rem;
+        }
+        input, select, button {
+            padding: 0.6rem;
+            font-size: 0.95rem;
+        }
+        th, td {
+            font-size: 0.85rem;
+        }
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        th, td {
+            min-width: 80px;
+        }
+    }
+
+  </style>
+    
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="page visible">
+  <img src="https://i.postimg.cc/cJ0hB6Gq/logo.jpg" alt="School Logo" class="logo" />
+  <h2 id="loginTitle">Teacher Login</h2>
+  <input type="text" id="loginUsername" placeholder="Username" autocomplete="off" />
+  <div class="password-container">
+    <input type="password" id="loginPassword" placeholder="Password" autocomplete="new-password" />
+     <!--<label><input type="checkbox" id="showPasswordCheckbox" /> Show</label>-->
+  </div>
+  <button onclick="login()" id="loginBtn">Login</button>
+  <p>About This App:</p>
+  <p>Lidya School App helps teachers register, edit and manage student records. Works offline and can be installed on phones.</p>
+  <p>This app is created by  filmon kinfe.  if you want more info about this app, contact me through:filmonkg028@gmail.com  or +251914764268</p>
+  
+</div>
+
+<!-- REGISTRATION PAGE -->
+<div id="registrationPage" class="page">
+  <img src="https://i.postimg.cc/cJ0hB6Gq/logo.jpg" alt="School Logo" class="logo" onerror="this.style.display='none'" />
+  <div class="topbar">
+    <div>
+      <button onclick="toggleTheme()">🌞/🌙</button>
+      <button onclick="toggleLanguage()">EN/AM</button>
+    </div>
+    <div class="controls">
+      <button onclick="goToSettings()">⚙️</button>
+      <button onclick="logout()" class="gray">Logout</button>
+    </div>
+  </div>
+  <h2 id="regTitle">Register Student</h2>
+  <input type="text" id="firstName" placeholder="First Name" />
+  <input type="text" id="fatherName" placeholder="Father's Name" />
+  <input type="text" id="grandfatherName" placeholder="Grandfather's Name" />
+  <input type="number" id="age" placeholder="Age" min="10" max="30" />
+  <select id="gender">
+    <option value="">Select Gender</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+  </select>
+   <select id="grade">
+    <option value="">Select Grade</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+  </select>
+  <input type="text" id="section" placeholder="Section" />
+  <input type="text" id="address" placeholder="Address" />
+  <input type="tel" id="phone" placeholder="Parent's Phone Number" />
+  <button onclick="saveStudent()" id="saveStudentBtn">Save Student</button>
+  <button onclick="goToStudentList()" id="viewStudentsBtn">View Students</button>
+</div>
+
+<!-- STUDENT LIST PAGE -->
+<div id="studentListPage" class="page">
+  <img src="https://i.postimg.cc/cJ0hB6Gq/logo.jpg" alt="School Logo" class="logo" onerror="this.style.display='none'" />
+  <div class="topbar">
+    <div><button onclick="exportExcel()" id="exportExcelBtn">📥 Export Excel</button></div>
+    <div class="controls">
+      <button onclick="goToSettings()">⚙️</button>
+      <button onclick="backToRegistration()" class="gray" id="backToRegBtn">← Back</button>
+    </div>
+  </div>
+  <h2 id="studentListTitle">Registered Students</h2>
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Grade</th><th>Section</th><th>Action</th></tr>
+    </thead>
+    <tbody id="studentTable"></tbody>
+  </table>
+</div>
+
+<!-- SETTINGS PAGE -->
+<div id="settingsPage" class="page">
+  <button onclick="backFromSettings()" class="gray">← Back</button>
+  <h2 id="settingsTitle">Account Settings</h2>
+  <p><strong id="savedUsernameLabel">Username:</strong> <span id="savedUsername"></span></p>
+  <p><strong id="savedPasswordLabel">Password:</strong> <span id="savedPassword"></span></p>
+  <input type="text" id="newUsername" placeholder="New Username" autocomplete="off" />
+  <input type="password" id="newPassword" placeholder="New Password" autocomplete="new-password" />
+  <button onclick="changeCredentials()" id="changeCredBtn">Change Username & Password</button>
+</div>
+
+<script>
+  // Elements
+  const loginTitle = document.getElementById("loginTitle");
+  const loginUsername = document.getElementById("loginUsername");
+  const loginPassword = document.getElementById("loginPassword");
+  const showPasswordCheckbox = document.getElementById("showPasswordCheckbox");
+  const loginBtn = document.getElementById("loginBtn");
+
+  const regTitle = document.getElementById("regTitle");
+  const firstName = document.getElementById("firstName");
+  const fatherName = document.getElementById("fatherName");
+  const grandfatherName = document.getElementById("grandfatherName");
+  const age = document.getElementById("age");
+  const gender = document.getElementById("gender");
+  const grade = document.getElementById("grade");
+  const section = document.getElementById("section");
+  const address = document.getElementById("address");
+  const phone = document.getElementById("phone");
+  const saveStudentBtn = document.getElementById("saveStudentBtn");
+  const viewStudentsBtn = document.getElementById("viewStudentsBtn");
+
+  const studentListTitle = document.getElementById("studentListTitle");
+  const exportExcelBtn = document.getElementById("exportExcelBtn");
+  const backToRegBtn = document.getElementById("backToRegBtn");
+
+  const settingsTitle = document.getElementById("settingsTitle");
+  const savedUsernameLabel = document.getElementById("savedUsernameLabel");
+  const savedPasswordLabel = document.getElementById("savedPasswordLabel");
+  const savedUsername = document.getElementById("savedUsername");
+  const savedPassword = document.getElementById("savedPassword");
+  const newUsername = document.getElementById("newUsername");
+  const newPassword = document.getElementById("newPassword");
+  const changeCredBtn = document.getElementById("changeCredBtn");
+
+  let lastPageBeforeSettings = "registrationPage";
+
+  // Initialize account if not set
+  if (!localStorage.getItem("account")) {
+    localStorage.setItem("account", JSON.stringify({ username: "admin", password: "admin" }));
+  }
+  let account = JSON.parse(localStorage.getItem("account"));
+
+  // Show/hide password on checkbox toggle
+  showPasswordCheckbox.addEventListener('change', () => {
+    if (showPasswordCheckbox.checked) {
+      loginPassword.type = "text";
+    } else {
+      loginPassword.type = "password";
+    }
+  });
+
+  // Show page helper
+  function showPage(id) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("visible"));
+    document.getElementById(id).classList.add("visible");
+  }
+
+  // Login function
+  function login() {
+    const u = loginUsername.value.trim();
+    const p = loginPassword.value.trim();
+    if (u === account.username && p === account.password) {
+      sessionStorage.setItem("loggedIn", "true");
+      showPage("registrationPage");
+      updateAccountDisplay();
+      clearStudentForm();
+      displayStudents();
+      applyThemeFromStorage();
+      clearLoginInputs();
+    } else {
+      alert("Incorrect username or password!");
+    }
+  }
+
+  // Clear login inputs so password won't be pre-filled on page load
+  function clearLoginInputs() {
+    loginUsername.value = "";
+    loginPassword.value = "";
+    showPasswordCheckbox.checked = false;
+    loginPassword.type = "password";
+  }
+
+  // Logout function
+  function logout() {
+    sessionStorage.removeItem("loggedIn");
+    showPage("loginPage");
+  }
+
+  // Save new student data
+  function saveStudent() {
+    const f = firstName.value.trim(),
+          fa = fatherName.value.trim(),
+          ga = grandfatherName.value.trim(),
+          ageV = age.value.trim(),
+          genderV = gender.value,
+          gradeV = grade.value,
+          sec = section.value.trim(),
+          add = address.value.trim(),
+          ph = phone.value.trim();
+
+    if (!f || !fa || !ga || !gradeV || !sec) {
+      alert("Please fill required fields.");
+      return;
+    }
+
+    let students = JSON.parse(localStorage.getItem("students") || "[]");
+    const fullName = `${f} ${fa} ${ga}`;
+    if (students.some(s => s.fullName === fullName)) {
+      alert("Student already registered.");
+      return;
+    }
+
+    students.push({
+      id: Date.now(),
+      fullName,
+      age: ageV,
+      gender: genderV,
+      grade: gradeV,
+      section: sec,
+      address: add,
+      phone: ph
+    });
+    localStorage.setItem("students", JSON.stringify(students));
+    alert("Student saved!");
+    clearStudentForm();
+  }
+
+  // Clear student registration form
+  function clearStudentForm() {
+    [firstName, fatherName, grandfatherName, age, section, address, phone].forEach(i => i.value = "");
+    gender.value = "";
+    grade.value = "";
+  }
+
+  // Go to student list page
+  function goToStudentList() {
+    displayStudents();
+    showPage("studentListPage");
+  }
+
+  // Back to registration page
+  function backToRegistration() {
+    showPage("registrationPage");
+  }
+
+  // Display students in table
+  function displayStudents() {
+    const students = JSON.parse(localStorage.getItem("students") || "[]");
+    const table = document.getElementById("studentTable");
+    table.innerHTML = "";
+    students.forEach(s => {
+      table.innerHTML += `<tr>
+        <td>${s.fullName}</td>
+        <td>${s.grade}</td>
+        <td>${s.section}</td>
+        <td><button onclick="deleteStudent(${s.id})">Delete</button></td>
+      </tr>`;
+    });
+  }
+
+  // Delete student after confirmation
+  function deleteStudent(id) {
+    const lang = document.documentElement.lang;
+    const message = lang === "am"
+      ? "እርግጠኛ ነህ ይህን ተማሪ ማጥፋት ትፈልጋለህ?"
+      : "Are you sure you want to delete this student?";
+    if (confirm(message)) {
+      let students = JSON.parse(localStorage.getItem("students") || "[]");
+      students = students.filter(s => s.id !== id);
+      localStorage.setItem("students", JSON.stringify(students));
+      displayStudents();
+    }
+  }
+
+  // Go to settings page
+  function goToSettings() {
+    lastPageBeforeSettings = document.querySelector(".page.visible").id;
+    showPage("settingsPage");
+    updateAccountDisplay();
+  }
+
+  // Back from settings page
+  function backFromSettings() {
+    showPage(lastPageBeforeSettings);
+  }
+
+  // Update displayed account info in settings
+  function updateAccountDisplay() {
+    savedUsername.textContent = account.username;
+    savedPassword.textContent = account.password;
+  }
+
+  // Change username and password
+  function changeCredentials() {
+    const u = newUsername.value.trim();
+    const p = newPassword.value.trim();
+    if (!u || !p) {
+      alert("Fill both username and password");
+      return;
+    }
+    account = { username: u, password: p };
+    localStorage.setItem("account", JSON.stringify(account));
+    updateAccountDisplay();
+    alert("Credentials updated!");
+    newUsername.value = "";
+    newPassword.value = "";
+  }
+
+  // Toggle dark/light theme and store preference
+  function toggleTheme() {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("darkMode", document.body.classList.contains("dark") ? "true" : "false");
+  }
+
+  // Apply theme from localStorage on load
+  function applyThemeFromStorage() {
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }
+
+  // Toggle language (EN/AM)
+function toggleLanguage() {
+  const lang = document.documentElement.lang === "en" ? "am" : "en";
+  document.documentElement.lang = lang;
+
+  if (lang === "am") {
+    loginTitle.textContent = "የመምህር መግቢያ";
+    loginUsername.placeholder = "የተጠቃሚ ስም";
+    loginPassword.placeholder = "የሚስጥር ቃል";
+    loginBtn.textContent = "ግባ";
+
+    regTitle.textContent = "የተማሪ መመዝገቢያ";
+    firstName.placeholder = "ስም";
+    fatherName.placeholder = "የአባት ስም";
+    grandfatherName.placeholder = "የአያት ስም";
+    age.placeholder = "እድሜ";
+    gender.options[0].text = "ፆታ ምረጥ";
+    gender.options[1].text = "ወንድ";
+    gender.options[2].text = "ሴት";
+    grade.options[0].text = "ክፍል";
+    grade.options[1].text = "9";
+    grade.options[2].text = "10";
+    grade.options[3].text = "11";
+    grade.options[4].text = "12";
+    section.placeholder = "ክፍል ቡድን";
+    address.placeholder = "አድራሻ";
+    phone.placeholder = "የወላጅ ስልክ";
+    saveStudentBtn.textContent = "መዝግብ";
+    viewStudentsBtn.textContent = "የተመዘገቡ ተማሪዎችን እይ";
+
+    studentListTitle.textContent = "የተመዘገቡ ተማሪዎች";
+    exportExcelBtn.textContent = "ወደ Excel ላክ";
+    backToRegBtn.textContent = "ተመለስ";
+
+    settingsTitle.textContent = "የመለያ ቅንብሮች";
+    savedUsernameLabel.textContent = "የተጠቃሚ ስም:";
+    savedPasswordLabel.textContent = "የይለፍ ቃል:";
+    newUsername.placeholder = "አዲስ የተጠቃሚ ስም";
+    newPassword.placeholder = "አዲስ የይለፍ ቃል";
+    changeCredBtn.textContent = "ቀይር";
+
+  } else {
+    // ENGLISH TEXTS - set all back to English without reload
+    loginTitle.textContent = "Teacher Login";
+    loginUsername.placeholder = "Username";
+    loginPassword.placeholder = "Password";
+    loginBtn.textContent = "Login";
+
+    regTitle.textContent = "Register Student";
+    firstName.placeholder = "First Name";
+    fatherName.placeholder = "Father's Name";
+    grandfatherName.placeholder = "Grandfather's Name";
+    age.placeholder = "Age";
+    gender.options[0].text = "Select Gender";
+    gender.options[1].text = "Male";
+    gender.options[2].text = "Female";
+    grade.options[0].text = "Grade";
+    grade.options[1].text = "9";
+    grade.options[2].text = "10";
+    grade.options[3].text = "11";
+    grade.options[4].text = "12";
+    section.placeholder = "Section";
+    address.placeholder = "Address";
+    phone.placeholder = "Parent's Phone Number";
+    saveStudentBtn.textContent = "Save Student";
+    viewStudentsBtn.textContent = "View Students";
+
+    studentListTitle.textContent = "Registered Students";
+    exportExcelBtn.textContent = "📥 Export Excel";
+    backToRegBtn.textContent = "← Back";
+
+    settingsTitle.textContent = "Account Settings";
+    savedUsernameLabel.textContent = "Username:";
+    savedPasswordLabel.textContent = "Password:";
+    newUsername.placeholder = "New Username";
+    newPassword.placeholder = "New Password";
+    changeCredBtn.textContent = "Change Username & Password";
+  }
+}
+ 
+  
+
+  // Export student data as Excel
+  function exportExcel() {
+    const students = JSON.parse(localStorage.getItem("students") || "[]");
+    if (!students.length) return alert("No students to export");
+    const ws = XLSX.utils.json_to_sheet(students);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Students");
+    XLSX.writeFile(wb, "students.xlsx");
+  }
+
+  // On page load
+  window.addEventListener("DOMContentLoaded", () => {
+    applyThemeFromStorage();
+    clearLoginInputs();
+    if (sessionStorage.getItem("loggedIn") === "true") {
+      showPage("registrationPage");
+      updateAccountDisplay();
+      displayStudents();
+    } else {
+      showPage("loginPage");
+    }
+  });
+
+</script>
+
+</body>
+</html>
