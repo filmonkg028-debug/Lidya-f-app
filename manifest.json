@@ -4,7 +4,7 @@
   "description": "This app is created by Filmon Kinfe G/her to help LIDYA secondary school registering students. Its purpose is to replace the paper registering students by digital App. If you want to know more about this App, you can contact me through these : filmonkg028@gmail.com or +251914764268.",
   "start_url": "index.html",
   "display": "standalone",
-  "orientation": "landscape",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#0a4f70",
   "icons": [
@@ -15,3 +15,4 @@
     }
   ]
 }
+
