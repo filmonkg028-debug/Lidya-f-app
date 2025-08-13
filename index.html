@@ -197,10 +197,7 @@
   </div>
   <button onclick="login()" id="loginBtn">Login</button>
   <div> </div>
-  <p></p>
-  <p></p>
-  <p></p>
-  <p></p>
+  
   <p>About This App:</p>
   <p>Lidya School App helps teachers register, edit and manage student records. Works offline and can be installed on phones.</p>
   <p>This app is created by  filmon kinfe.  if you want more info about this app, contact me through:filmonkg028@gmail.com  or +251914764268</p>
@@ -312,7 +309,7 @@
 
   // Initialize account if not set
   if (!localStorage.getItem("account")) {
-    localStorage.setItem("account", JSON.stringify({ username: "admin", password: "admin" }));
+    localStorage.setItem("account", JSON.stringify({ username: "Fila", password: "87654321lidya" }));
   }
   let account = JSON.parse(localStorage.getItem("account"));
 
@@ -606,6 +603,7 @@ function toggleLanguage() {
 
 </body>
 </html>
+
 
 
 
