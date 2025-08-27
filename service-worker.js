@@ -1,9 +1,9 @@
-const cacheName = 'lidya-cache-v1';
+const cacheName = 'lidya-cache-v2';
 const assets = [
-  './',
-  './index.html',
-  './manifest.json',
-  './lidya_icon_512x512.png'
+  '/',                     // root (very important!)
+  '/index.html',           // homepage
+  '/manifest.json',
+  '/lidya_icon_512x512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -12,8 +12,20 @@ self.addEventListener('install', event => {
   );
 });
 
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(key => key !== cacheName).map(key => caches.delete(key))
+      )
+    )
+  );
+});
+
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(res => res || fetch(event.request))
+    caches.match(event.request).then(res => {
+      return res || fetch(event.request).catch(() => caches.match('/index.html'));
+    })
   );
 });
