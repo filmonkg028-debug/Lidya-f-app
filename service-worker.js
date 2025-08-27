@@ -1,4 +1,4 @@
-const cacheName = 'lidya-cache-v2';
+const cacheName = 'lidya-cache-v3';
 const assets = [
   '/',                     // root (very important!)
   '/index.html',           // homepage
@@ -29,3 +29,4 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
